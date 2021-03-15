@@ -15,12 +15,14 @@ To get started, you will first need to have *python3*, *pipx*, and *poetry* inst
 To bootstrap your environment, run
 
 .. code-block:: bash
+
    python -m pip install --user pipx
    python -m pipx install poetry
 
 Once you have poetry installed, you can activate it's environment by running the below
 
 .. code-block:: bash
+
    poetry install
    poetry shell
 
@@ -34,6 +36,7 @@ Running the Fetcher
 To run the URI fetcher, you must first be in your poetry environment, and then you can run the module directly, as shown below.
 
 .. code-block:: bash
+
    poetry shell
    python -m project01.fetcher
 
