@@ -20,9 +20,11 @@ python = "^3.7"
 pandas = "^1.1"
 numpy = "^1.20"
 requests = "^2.25.1"
+sphinx-rtd-theme = "^0.5.1"
 
 [dev-dependencies]
 black = { version = "^20.8b1", python = "^3.6" }
+sphinx_rtd_theme = "^0.5"
 
 [tool.black]
 line-length = 120
