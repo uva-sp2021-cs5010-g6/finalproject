@@ -1,0 +1,5 @@
+##Source: https://fdc.nal.usda.gov/download-datasets.html
+https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_csv_2020-10-30.zip
+#https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_csv_2020-04-29.zip
+#https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_csv_2019-12-17.zip
+#https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_csv_%202019-04-02.zip

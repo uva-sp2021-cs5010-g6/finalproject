@@ -1,0 +1,49 @@
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry]
+name = "project01"
+version = "0.1.0"
+description = "Group 6's submission for CS5010's Final Project"
+authors = [
+    "Nitka Kataria <nk3rf@virginia.edu>",
+    "Robert Knuuti <uqq5zz@virginia.edu>",
+    "Swaroop Veerabhadrappa <sbv5dn@virginia.edu>",
+]
+license = "MIT"
+readme = "README.rst"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pandas = "^1.1"
+numpy = "^1.20"
+requests = "^2.25.1"
+
+[dev-dependencies]
+black = { version = "^20.8b1", python = "^3.6" }
+
+[tool.black]
+line-length = 120
+target_version = ['py36']
+include = '\.pyi?$'
+exclude = '''
+
+(
+  /(
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+  )/
+  | foo.py           # also separately exclude a file named foo.py in
+                     # the root of the project
+)
+'''
