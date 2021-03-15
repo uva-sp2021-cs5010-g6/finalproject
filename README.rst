@@ -38,5 +38,5 @@ To run the URI fetcher, you must first be in your poetry environment, and then y
 .. code-block:: bash
 
    poetry shell
-   python -m project01.fetcher
+   python -m project01.fetch
 
