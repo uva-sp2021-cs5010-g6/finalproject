@@ -111,6 +111,7 @@ class Fetcher():
                         zf.extractall(os.path.join(out, basen))
         return out
 
+
 def cli():
     """Creates a CLI parser
 
@@ -128,6 +129,7 @@ def cli():
                         default="dataset",
                         help="Path to a directory to output the files.")
     return parser
+
 
 if __name__ == "__main__":
     config = cli().parse_args()
