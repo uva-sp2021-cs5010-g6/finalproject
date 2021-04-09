@@ -21,10 +21,12 @@ pandas = "^1.1"
 numpy = "^1.20"
 requests = "^2.25.1"
 sphinx-rtd-theme = "^0.5.1"
+ipython = "^7.22.0"
 
 [dev-dependencies]
 black = { version = "^20.8b1", python = "^3.6" }
 sphinx_rtd_theme = "^0.5"
+ipython = "^7.22"
 
 [tool.black]
 line-length = 120
