@@ -23,12 +23,18 @@ requests = "^2.25.1"
 sphinx-rtd-theme = "^0.5.1"
 ipython = "^7.22.0"
 
-
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"
 black = { version = "^20.8b1", python = "^3.6" }
 sphinx_rtd_theme = "^0.5"
 ipython = "^7.22"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
 
 [tool.black]
 line-length = 120

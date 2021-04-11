@@ -130,9 +130,11 @@ def cli():
                         help="Path to a directory to output the files.")
     return parser
 
+def main(uri_file, out):
+    collector = Fetcher(uris=uri_file, base=out)
+    collector.fetch()
+
 
 if __name__ == "__main__":
     config = cli().parse_args()
-    collector = Fetcher(uris=config.urifile, base=config.outdir)
-    collector.fetch()
-
+    main(uri_file=config.urifile, out=config.outdir)
