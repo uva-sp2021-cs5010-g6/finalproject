@@ -53,6 +53,10 @@ class BaseFood:
         """Provides access to the object's dataframe
         """
         return self._df
+
+    def run_on_df(self, func, *args, **kwargs):
+        self._df = func(self._df, *args, **kwargs)
+        return self._df
     
     def __str__(self) -> str:
         return self._df.__str__()
@@ -122,7 +126,7 @@ def find_index_from_str(delimited_string: str, fnd: str, split: str = ","):
         int: The integer value representing where the string fnd is
         positioned in an array delimited by split.
     """
-    lst = [x.strip() for x in str(delimited_string).split(split)]
+    lst = [x.strip().lower() for x in str(delimited_string).split(split)]
     try:
         idx = lst.index(fnd)
     except ValueError:
