@@ -127,11 +127,16 @@ def find_index_from_str(delimited_string: str, fnd: str, split: str = ","):
         positioned in an array delimited by split.
     """
     lst = [x.strip().lower() for x in str(delimited_string).split(split)]
-    try:
-        idx = lst.index(fnd)
-    except ValueError:
-        idx = -1  # Entry not found
-    return idx
+    rank = -1
+    for idx in range(len(lst)):
+        try:
+            lst[idx].index(fnd)
+            rank = idx+1
+            break
+        except ValueError:
+            idx = -1  # Entry not found
+            continue
+    return rank
 
 
 def insert_index(df: pd.DataFrame,
