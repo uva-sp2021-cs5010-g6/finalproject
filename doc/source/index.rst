@@ -1,10 +1,10 @@
-.. CS5010 Group 6 Final Project documentation master file, created by
-   sphinx-quickstart on Mon Mar 15 16:20:15 2021.
+.. Corn Syrup Analysis documentation master file, created by
+   sphinx-quickstart on Thu Apr 15 17:10:38 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to CS5010 Group 6 Final Project's documentation!
-========================================================
+Welcome to Corn Syrup Analysis's documentation!
+===============================================
 
 .. toctree::
    :maxdepth: 2

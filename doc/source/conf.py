@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath('../../'))
 # -- Project information -----------------------------------------------------
 
 project = 'CS5010 Group 6 Final Project'
-copyright = '2021, a, b, c'
-author = 'a, b, c'
+copyright = '2021, UVA CS5010 Group 6'
+author = 'Nitika, Swaroop, Robert'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1.0'
@@ -33,6 +33,7 @@ release = '0.1.0'
 extensions = [
         'sphinx.ext.autodoc',
         'sphinx.ext.viewcode',
+        'sphinx.ext.napoleon',
         'sphinx_rtd_theme'
 ]
 
