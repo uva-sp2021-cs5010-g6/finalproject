@@ -25,8 +25,8 @@ import tempfile
 import zipfile
 
 
-class Fetcher():
-    def __init__(self, uris: str="uri.txt", base: str="dataset", feedback: bool=True):
+class Fetcher:
+    def __init__(self, uris: str = "uri.txt", base: str = "dataset", feedback: bool = True):
         """Creates a new fetcher method configured with the arguments specified.
 
         Args:
@@ -129,6 +129,7 @@ def cli():
                         default="dataset",
                         help="Path to a directory to output the files.")
     return parser
+
 
 def main(uri_file, out):
     collector = Fetcher(uris=uri_file, base=out)
