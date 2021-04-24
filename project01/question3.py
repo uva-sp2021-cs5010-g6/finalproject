@@ -1,4 +1,5 @@
 
+from typing import List
 import pprint
 import sys
 import pandas as pd
@@ -64,7 +65,7 @@ def find_top_five_food_categories(df: pd.DataFrame,
 
 
 def metrics_on_food_categories(df: pd.DataFrame,
-                               col: str = "branded_food_category") -> list[pd.Series]:
+                               col: str = "branded_food_category") -> List[pd.Series]:
     """Produces simple analysis on a specific column in a dataframe
 
     Args:
