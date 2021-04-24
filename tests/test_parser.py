@@ -6,9 +6,9 @@ import pandas as pd
 import project01.parser as parser
 
 
-def test_food_object_inheritance():
+def test_food_object_inheritance(datadir):
     fb_object = parser.FoodBrandObject(datadir.join("branded_food.csv"))
-    assert issubclass(fb_object, parser.BaseFood)
+    assert issubclass(type(fb_object), parser.BaseFood)
 
 
 def test_insert_index_col(datadir):
@@ -55,7 +55,7 @@ def test_cornsyrup_clamp_mutates_df(datadir):
 
 def test_cornsyrup_clamp_alt_column(datadir):
     bfood = parser.BaseFood(datadir.join("simple.csv"))
-    bfood.df["corn_syrup_idx"] = pd.to_numeric(bfood.df["corn_syrup_idx"])
+    bfood.df["id"] = pd.to_numeric(bfood.df["id"])
     ret = bfood.clamp(col="id")
     assert len(bfood.df) == 4
 
