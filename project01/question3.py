@@ -34,14 +34,14 @@ def establish_food_object(csv_file: str) -> food_parser.FoodBrandObject:
     return bfood
 
 
-def clamp_cornsyrup(df: pd.DataFrame,
+def clamp_cornsyrup(bfood: food_parser.BaseFood,
                     floor: int = 0,
                     ceiling: int = None,
                     col: str = "corn_syrup_idx") -> pd.DataFrame:
     """Clamping function used to filter the allowed indices of a column.
 
     Args:
-        df (pd.DataFrame): The dataframe to operate on.
+        bfood (food_parser.BaseFood): The dataframe to operate on.
         floor (int): The lowest allowed value of the column. Defaults to 0.
         ceiling (int): The highest allowed value in the column.
             Defaults to the maximum value in the column.
@@ -51,25 +51,21 @@ def clamp_cornsyrup(df: pd.DataFrame,
         pd.DataFrame: A new dataframe, where only the rows within the values
             of floor and ceiling are included, and all others are dropped.
     """
-    ceil = ceiling if ceiling is not None else df[col].max()+1
-    d = df[(df[col] > floor) & (df[col] < ceil)]
-    return d
+    return bfood.clamp(floor=floor, ceiling=ceiling, col=col)
 
 
-def find_top_five_food_categories(df: pd.DataFrame,
+def find_top_five_food_categories(bfood: food_parser.BaseFood,
                                   col: str = "branded_food_category") -> pd.DataFrame:
     """Establishes the dataset for top5 food categories
 
     Args:
-        df (pd.DataFrame): The dataframe to seek against.
-        col (str): The column to find the top occurances of.
+        bfood (food_parser.BaseFood): The dataframe to seek against.
+        col (str): The column to find the top occurrences of.
     Returns:
         pd.DataFrame: A filtered dataframe containing only the foods
         in the top five largest categories.
     """
-    top5_series = df[col].value_counts().nlargest(5)
-    top5_names = top5_series.index.array
-    return df[df[col].isin(top5_names)]
+    return bfood.find_top(col=col, limit=5)
 
 
 def metrics_on_food_categories(df: pd.DataFrame,
@@ -136,12 +132,12 @@ def main(csv_file: str):
     """
     bfood = establish_food_object(csv_file)
     pprint.pprint(metrics_on_food_categories(bfood.df))
-    df = find_top_five_food_categories(bfood.df)
+    df = find_top_five_food_categories(bfood)
     pprint.pprint(metrics_on_food_categories(df))
     metrics_on_food_categories(df)
-    df_cornsyrup_nomax = clamp_cornsyrup(df)
+    df_cornsyrup_nomax = clamp_cornsyrup(bfood)
     plot(df_cornsyrup_nomax, out="q3-unbound.png")
-    df_cornsyrup_10max = clamp_cornsyrup(df, ceiling=10)
+    df_cornsyrup_10max = clamp_cornsyrup(bfood, ceiling=10)
     plot(df_cornsyrup_10max, out="q3-10max.png")
 
 
