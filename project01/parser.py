@@ -24,7 +24,7 @@ class BaseFood:
         Returns:
            pd.DataFrame: The CSV file loaded as a dataframe.
         """
-        return pd.read_csv(csv_file, header=0)
+        return pd.read_csv(csv_file, header=0, dtype=object)
 
     def _filter(self, col: str, val: Any) -> pd.DataFrame:
         """Returns the rows of the dataframe which have the passed value in the specified column.
@@ -126,11 +126,12 @@ def find_index_from_str(delimited_string: str, fnd: str, split: str = ","):
         int: The integer value representing where the string fnd is
         positioned in an array delimited by split.
     """
+    key = fnd.lower()
     lst = [x.strip().lower() for x in str(delimited_string).split(split)]
     rank = -1
     for idx in range(len(lst)):
         try:
-            lst[idx].index(fnd)
+            lst[idx].index(key)
             rank = idx+1
             break
         except ValueError:
@@ -159,6 +160,6 @@ def insert_index(df: pd.DataFrame,
         with the index value specified.  Note that if the value is not found, the
         column's value will be less than 0.
     """
-    newcol = "".join([find.replace(" ", "_"), "_idx"])
+    newcol = "".join([find.replace(" ", "_").lower(), "_idx"])
     df[newcol] = df[col].apply(find_index_from_str, fnd=find, split=sep)
     return df
