@@ -1,3 +1,11 @@
+"""
+This module provides the functions and code in support of answering the
+question "How do popular food categories fare with corn syrup?"
+
+The `main()` function provides the pythonic driver, however this can
+be run directly using python3 -m project01.question3 after the files
+have been fetched from the USDA (see `project01.fetcher`).
+"""
 
 import pprint
 import sys
@@ -104,7 +112,20 @@ def plot(df: pd.DataFrame, out: str = "plot.png"):
 
 
 def main(csv_file: str):
-    """Driver for the third question: "How do popular food categories fare with corn syrup?"
+    """Pythonic driver for our third question / query
+
+    This method:
+      1. Establishes our food object of interest
+      2. Outputs trivial summary statistics on a column
+      3. Establishes a subset to the top five food categories
+      4. Outputs metrics on the subset.
+      5. Establishes another subset from the dataframe by limiting
+         the data to only values that have corn syrup
+      6. Produces a violin plot to show our data density across the
+         top five groups.  We see a large left tail.
+      7. After reviewing the data, the corn_syrup_idx ceiling appears
+         to be near ten, so we further clamp the data down to center
+         our distribution.
 
     Args:
         csv_file (str): The path to the branded_foods.csv file.
