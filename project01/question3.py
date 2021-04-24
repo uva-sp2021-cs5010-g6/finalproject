@@ -42,7 +42,7 @@ def clamp_cornsyrup(df: pd.DataFrame,
         pd.DataFrame: A new dataframe, where only the rows within the values
             of floor and ceiling are included, and all others are dropped.
     """
-    ceil = ceiling if ceiling is not None else df[col].max()
+    ceil = ceiling if ceiling is not None else df[col].max()+1
     d = df[(df[col] > floor) & (df[col] < ceil)]
     return d
 
@@ -58,7 +58,7 @@ def find_top_five_food_categories(df: pd.DataFrame,
         pd.DataFrame: A filtered dataframe containing only the foods
         in the top five largest categories.
     """
-    top5_series = df[col].value_counts().nlargest(7)
+    top5_series = df[col].value_counts().nlargest(5)
     top5_names = top5_series.index.array
     return df[df[col].isin(top5_names)]
 
