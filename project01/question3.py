@@ -1,4 +1,5 @@
 
+import pprint
 import sys
 import pandas as pd
 import seaborn as sns
@@ -9,14 +10,40 @@ import project01.parser as food_parser
 
 
 def establish_food_object(csv_file: str) -> food_parser.FoodBrandObject:
+    """Creates our food object leveraging our general purpose parser.
+
+    Args:
+        csv_file (str): The path to the food brand CSV file.
+
+    Returns:
+        food_parser.FoodBrandObject: A general purpose brand object which
+            contains the parsed dataframe with corn syrup already added as
+            a new index.
+    """
     bfood = food_parser.FoodBrandObject(csv_file)
     bfood.run_on_df(food_parser.insert_index, find="corn syrup")
     return bfood
 
 
-def clamp_cornsyrup(df, floor=0, ceiling=None):
-    ceil = ceiling if ceiling is not None else df["corn_syrup_idx"].max()
-    d = df[(df["corn_syrup_idx"] > floor) & (df["corn_syrup_idx"] < ceil)]
+def clamp_cornsyrup(df: pd.DataFrame,
+                    floor: int = 0,
+                    ceiling: int = None,
+                    col: str = "corn_syrup_idx") -> pd.DataFrame:
+    """Clamping function used to filter the allowed indices of a column.
+
+    Args:
+        df (pd.DataFrame): The dataframe to operate on.
+        floor (int): The lowest allowed value of the column. Defaults to 0.
+        ceiling (int): The highest allowed value in the column.
+            Defaults to the maximum value in the column.
+        col (str): The column name to operate on.  Defaults to corn_syrup_idx.
+
+    Returns:
+        pd.DataFrame: A new dataframe, where only the rows within the values
+            of floor and ceiling are included, and all others are dropped.
+    """
+    ceil = ceiling if ceiling is not None else df[col].max()
+    d = df[(df[col] > floor) & (df[col] < ceil)]
     return d
 
 
@@ -31,16 +58,37 @@ def find_top_five_food_categories(df: pd.DataFrame,
         pd.DataFrame: A filtered dataframe containing only the foods
         in the top five largest categories.
     """
-    top5_series = df[col].value_counts().nlargest(5)
+    top5_series = df[col].value_counts().nlargest(7)
     top5_names = top5_series.index.array
     return df[df[col].isin(top5_names)]
 
 
-def correlate_food_category_by_brand(df: pd.DataFrame) -> pd.DataFrame:
-    pass
+def metrics_on_food_categories(df: pd.DataFrame,
+                               col: str = "branded_food_category") -> list[pd.Series]:
+    """Produces simple analysis on a specific column in a dataframe
+
+    Args:
+        df (pd.DataFrame): The dataframe to operate on.
+        col (str): The column to perform analysis on.  Default: branded_food_category.
+
+    Returns:
+        list[pd.Series]: The output of describe() and value_counts() on the dataframe's series.
+    """
+    return [df[col].describe(), df[col].value_counts()]
 
 
-def plot(df, out="plot.png"):
+def plot(df: pd.DataFrame, out: str = "plot.png"):
+    """Creates a violin plot of the distribution of data.
+
+    Args:
+        df (pd.DataFrame): The dataframe to use when plotting.
+        out (str): The path to save the plotting graphic to.
+
+    Returns:
+        None: The graphic is saved to `out` as a side effect.
+    """
+    # Note, we need to establish the figure to ensure sns doesn't
+    # try to add to its prior plot.
     fig, ax1 = plt.subplots(figsize=(12,6))
     ax_sns = sns.violinplot(x="corn_syrup_idx",
                             y="branded_food_category",
@@ -48,13 +96,27 @@ def plot(df, out="plot.png"):
                             data=df, ax=ax1)
     ax1.set(xlabel="Rank",
             ylabel="Food Category")
+    # Calling plt.tight_layout() ensures our labels fit in our
+    # plotting space.
     plt.tight_layout()
     fig.savefig(out)
 
 
-def main(csv_file):
+def main(csv_file: str):
+    """Driver for the third question: "How do popular food categories fare with corn syrup?"
+
+    Args:
+        csv_file (str): The path to the branded_foods.csv file.
+
+    Returns:
+        None: Output to the terminal statistics and various
+        plots are written out to file.
+    """
     bfood = establish_food_object(csv_file)
+    pprint.pprint(metrics_on_food_categories(bfood.df))
     df = find_top_five_food_categories(bfood.df)
+    pprint.pprint(metrics_on_food_categories(df))
+    metrics_on_food_categories(df)
     df_cornsyrup_nomax = clamp_cornsyrup(df)
     plot(df_cornsyrup_nomax, out="q3-unbound.png")
     df_cornsyrup_10max = clamp_cornsyrup(df, ceiling=10)
