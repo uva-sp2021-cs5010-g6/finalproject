@@ -61,6 +61,14 @@ class BaseFood:
     def __str__(self) -> str:
         return self._df.__str__()
 
+    def cleanup(self) -> pd.DataFrame:
+        """Cleans up dataset based upon EDA analysis.
+
+        Returns:
+            pd.DataFrame: The cleaned dataframe.
+        """
+        raise NotImplementedError("Base cleanup method must be implemented in subclasses of object.")
+
 
 class FoodObject(BaseFood):
     def __init__(self, csv_file: str = None) -> None:
@@ -81,6 +89,9 @@ class FoodObject(BaseFood):
         """
         return self._filter("food_category_id", grp)
 
+    def cleanup(self):
+        raise NotImplementedError("To be implemented.")
+
 
 class FoodBrandObject(BaseFood):
     def __init__(self, csv_file: str = None) -> None:
@@ -100,6 +111,21 @@ class FoodBrandObject(BaseFood):
             pd.DataFrame: A subset of the data for the specified brand owner.
         """
         return self._filter("brand_owner", brand)
+
+    def cleanup(self) -> pd.DataFrame:
+        """Cleans up dataset based upon EDA analysis.
+
+        Returns:
+            pd.DataFrame: The cleaned dataframe.
+        """
+        self._df['modified_date'] = pd.to_datetime(self._df['modified_date'], format="%Y-%m-%d")
+        self._df['available_date'] = pd.to_datetime(self._df['available_date'], format='%Y-%m-%d')
+        self._df['discontinued_date'] = pd.to_datetime(self._df['discontinued_date'], format='%Y-%m-%d')
+        # del self._df['discontinued_date'] # We are dropping columns as well later.
+        self._df.dropna(how='all')
+        self._df.dropna(subset=['brand_owner', 'ingredients', 'serving_size',
+                                'serving_size_unit', 'branded_food_category'], inplace=True)
+        return self._df
 
 
 def load(csv_dir: Optional[str] = "dataset") -> List[FoodObject]:

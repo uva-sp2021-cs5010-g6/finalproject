@@ -21,6 +21,7 @@ def establish_food_object(csv_file: str) -> food_parser.FoodBrandObject:
             a new index.
     """
     bfood = food_parser.FoodBrandObject(csv_file)
+    bfood.cleanup()
     bfood.run_on_df(food_parser.insert_index, find="corn syrup")
     return bfood
 
