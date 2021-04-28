@@ -1,3 +1,11 @@
+"""
+This module contains the shared code used to read, parse, and produce
+a dataframe object using our USDA dataset.  Reviewing our dataset, we
+find that there's several common columns and indices, indicating that
+we could adopt an object-oriented approach, where we have a base object
+and each of our data tables could expand upon.
+
+"""
 
 import os
 from typing import Any, List, Optional
@@ -57,7 +65,53 @@ class BaseFood:
     def run_on_df(self, func, *args, **kwargs):
         self._df = func(self._df, *args, **kwargs)
         return self._df
-    
+
+    def cleanup(self) -> pd.DataFrame:
+        """Cleans up dataset based upon EDA analysis.
+
+        Returns:
+            pd.DataFrame: The cleaned dataframe.
+        """
+        raise NotImplementedError("Base cleanup method must be implemented in subclasses of object.")
+
+    def clamp(self,
+              floor: int = 0,
+              ceiling: int = None,
+              col: str = "corn_syrup_idx") -> pd.DataFrame:
+        """Clamping function used to filter the allowed indices of a column.
+
+        Args:
+            df (pd.DataFrame): The dataframe to operate on.
+            floor (int): The lowest allowed value of the column. Defaults to 0.
+            ceiling (int): The highest allowed value in the column.
+                Defaults to the maximum value in the column.
+            col (str): The column name to operate on.  Defaults to corn_syrup_idx.
+
+        Returns:
+            pd.DataFrame: A new dataframe, where only the rows within the values
+                of floor and ceiling are included, and all others are dropped.
+        """
+        ceil = ceiling if ceiling is not None else self._df[col].max() + 1
+        self._df = self._df[(self._df[col] > floor) & (self._df[col] < ceil)]
+        return self._df
+
+    def find_top(self,
+                 limit: int = 5,
+                 col: str = "branded_food_category") -> pd.DataFrame:
+        """Establishes the dataset for finding the largest values in the food object.
+
+        Args:
+            limit (int): The total number of records to return from the dataset.
+            col (str): The column to find the top occurances of.
+        Returns:
+            pd.DataFrame: A filtered dataframe containing only the foods
+            in the top five largest categories.
+        """
+        top_series = self._df[col].value_counts().nlargest(limit)
+        top_names = top_series.index.array
+        self._df = self._df[self._df[col].isin(top_names)]
+        return self._df
+
     def __str__(self) -> str:
         return self._df.__str__()
 
@@ -81,6 +135,9 @@ class FoodObject(BaseFood):
         """
         return self._filter("food_category_id", grp)
 
+    def cleanup(self):
+        raise NotImplementedError("To be implemented.")
+
 
 class FoodBrandObject(BaseFood):
     def __init__(self, csv_file: str = None) -> None:
@@ -100,6 +157,21 @@ class FoodBrandObject(BaseFood):
             pd.DataFrame: A subset of the data for the specified brand owner.
         """
         return self._filter("brand_owner", brand)
+
+    def cleanup(self) -> pd.DataFrame:
+        """Cleans up dataset based upon EDA analysis.
+
+        Returns:
+            pd.DataFrame: The cleaned dataframe.
+        """
+        self._df['modified_date'] = pd.to_datetime(self._df['modified_date'], format="%Y-%m-%d")
+        self._df['available_date'] = pd.to_datetime(self._df['available_date'], format='%Y-%m-%d')
+        self._df['discontinued_date'] = pd.to_datetime(self._df['discontinued_date'], format='%Y-%m-%d')
+        # del self._df['discontinued_date'] # We are dropping columns as well later.
+        self._df.dropna(how='all')
+        self._df.dropna(subset=['brand_owner', 'ingredients', 'serving_size',
+                                'serving_size_unit', 'branded_food_category'], inplace=True)
+        return self._df
 
 
 def load(csv_dir: Optional[str] = "dataset") -> List[FoodObject]:
