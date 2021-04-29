@@ -18,7 +18,7 @@ from typing import List
 import project01.parser as food_parser
 
 
-def establish_food_object(csv_file: str) -> food_parser.FoodBrandObject:
+def establish_food_object_cornsyrup(csv_file: str) -> food_parser.FoodBrandObject:
     """Creates our food object leveraging our general purpose parser.
 
     Args:
@@ -35,10 +35,47 @@ def establish_food_object(csv_file: str) -> food_parser.FoodBrandObject:
     return bfood
 
 
+def establish_food_object_sugar(csv_file: str) -> food_parser.FoodBrandObject:
+    """Creates our food object leveraging our general purpose parser.
+
+    Args:
+        csv_file (str): The path to the food brand CSV file.
+
+    Returns:
+        food_parser.FoodBrandObject: A general purpose brand object which
+            contains the parsed dataframe with corn syrup already added as
+            a new index.
+    """
+    bfood = food_parser.FoodBrandObject(csv_file)
+    bfood.cleanup()
+    bfood.run_on_df(food_parser.insert_index, find="sugar")
+    return bfood
+
+
 def clamp_cornsyrup(bfood: food_parser.BaseFood,
                     floor: int = 0,
                     ceiling: int = None,
                     col: str = "corn_syrup_idx") -> pd.DataFrame:
+    """Clamping function used to filter the allowed indices of a column.
+
+    Args:
+        bfood (food_parser.BaseFood): The dataframe to operate on.
+        floor (int): The lowest allowed value of the column. Defaults to 0.
+        ceiling (int): The highest allowed value in the column.
+            Defaults to the maximum value in the column.
+        col (str): The column name to operate on.  Defaults to corn_syrup_idx.
+
+    Returns:
+        pd.DataFrame: A new dataframe, where only the rows within the values
+            of floor and ceiling are included, and all others are dropped.
+    """
+    return bfood.clamp(floor=floor, ceiling=ceiling, col=col)
+
+
+def clamp_sugar(bfood: food_parser.BaseFood,
+                    floor: int = 0,
+                    ceiling: int = None,
+                    col: str = "sugar_idx") -> pd.DataFrame:
     """Clamping function used to filter the allowed indices of a column.
 
     Args:
@@ -83,7 +120,7 @@ def metrics_on_brands(df: pd.DataFrame,
     return [df[col].describe(), df[col].value_counts()]
 
 
-def plot(df: pd.DataFrame, out: str = "plot.png"):
+def plot_cornsyrup(df: pd.DataFrame, out: str = "plot.png"):
     """Creates a violin plot of the distribution of data.
 
     Args:
@@ -95,11 +132,34 @@ def plot(df: pd.DataFrame, out: str = "plot.png"):
     """
     # Note, we need to establish the figure to ensure sns doesn't
     # try to add to its prior plot.
-    fig, ax1 = plt.subplots(figsize=(12,6))
+    fig1, ax1 = plt.subplots(figsize=(12,6))
     sns.violinplot(x="corn_syrup_idx",
                             y="brand_owner",
                             orient="h",
-                            data=df, ax=ax1)
+                            data=df, ax=ax1).set(title="Top 10 brands: Corn Syrup")
+    ax1.set(xlabel="Rank",
+            ylabel="Brand Owner")
+    # Calling plt.tight_layout() ensures our labels fit in our
+    # plotting space.
+    plt.tight_layout()
+    fig1.savefig(out)
+
+
+def plot_sugar(df: pd.DataFrame, out: str = "plot.png"):
+    """Creates a violin plot of the distribution of data.
+
+    Args:
+        df (pd.DataFrame): The dataframe to use when plotting.
+        out (str): The path to save the plotting graphic to.
+
+    Returns:
+        None: The graphic is saved to `out` as a side effect.
+    """
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    sns.violinplot(x="sugar_idx",
+                   y="brand_owner",
+                   orient="h",
+                   data=df, ax=ax1).set(title="Top 10 brands: Sugar")
     ax1.set(xlabel="Rank",
             ylabel="Brand Owner")
     # Calling plt.tight_layout() ensures our labels fit in our
@@ -128,18 +188,33 @@ def main(csv_file: str):
         None: Output to the terminal statistics and various
         plots are written out to file.
     """
-    bfood = establish_food_object(csv_file)
-    print("metrics on brands:")
-    pprint.pprint(metrics_on_brands(bfood.df))
-    df = find_top_ten_brands(bfood)
+    bfood_cornsyrup = establish_food_object_cornsyrup(csv_file)
+    print("metrics on brands with corn syrup:")
+    pprint.pprint(metrics_on_brands(bfood_cornsyrup.df))
+    df_cornsyrup = find_top_ten_brands(bfood_cornsyrup)
     print("---------------")
-    print("metrics on top 10 brands:")
-    pprint.pprint(metrics_on_brands(df))
-    metrics_on_brands(df)
-    df_cornsyrup_nomax = clamp_cornsyrup(bfood)
-    plot(df_cornsyrup_nomax, out="q2-unbound.png")
-    df_cornsyrup_10max = clamp_cornsyrup(bfood, ceiling=10)
-    plot(df_cornsyrup_10max, out="q2-10max.png")
+    print("metrics on top 10 brands with corn syrup:")
+    pprint.pprint(metrics_on_brands(df_cornsyrup))
+    metrics_on_brands(df_cornsyrup)
+    df_cornsyrup_nomax = clamp_cornsyrup(bfood_cornsyrup)
+    plot_cornsyrup(df_cornsyrup_nomax, out="q2-cornsyrup-unbound.png")
+    df_cornsyrup_10max = clamp_cornsyrup(bfood_cornsyrup, ceiling=10)
+    plot_cornsyrup(df_cornsyrup_10max, out="q2-cornsyrup-10max.png")
+
+    print("---------------")
+
+    bfood_sugar = establish_food_object_sugar(csv_file)
+    print("metrics on brands with sugar:")
+    pprint.pprint(metrics_on_brands(bfood_sugar.df))
+    df_sugar = find_top_ten_brands(bfood_sugar)
+    print("---------------")
+    print("metrics on top 10 brands with sugar:")
+    pprint.pprint(metrics_on_brands(df_sugar))
+    metrics_on_brands(df_sugar)
+    df_sugar_nomax = clamp_sugar(bfood_sugar)
+    plot_sugar(df_sugar_nomax, out="q2-sugar-unbound.png")
+    df_sugar_10max = clamp_sugar(bfood_sugar, ceiling=10)
+    plot_sugar(df_sugar_10max, out="q2-sugar-10max.png")
 
 
 if __name__ == "__main__":
