@@ -1,6 +1,6 @@
 """
 This module provides the functions and code in support of answering the
-question "How do solid food items (grams) and liquid item (ml) fare with corn syrup?"
+question "How do solid food items (grams) and liquid item (ml) fare with corn syrup and sugar?"
 
 The `main()` function provides the pythonic driver, however this can
 be run directly using python3 -m project01.question4 after the files

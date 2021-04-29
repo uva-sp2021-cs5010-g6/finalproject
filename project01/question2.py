@@ -1,6 +1,6 @@
 """
 This module provides the functions and code in support of answering the
-question "How do popular brands fare with corn syrup?"
+question "How do popular brands fare with corn syrup and sugar?"
 
 The `main()` function provides the pythonic driver, however this can
 be run directly using python3 -m project01.question2 after the files
@@ -43,7 +43,7 @@ def establish_food_object_sugar(csv_file: str) -> food_parser.FoodBrandObject:
 
     Returns:
         food_parser.FoodBrandObject: A general purpose brand object which
-            contains the parsed dataframe with corn syrup already added as
+            contains the parsed dataframe with sugar already added as
             a new index.
     """
     bfood = food_parser.FoodBrandObject(csv_file)
@@ -83,7 +83,7 @@ def clamp_sugar(bfood: food_parser.BaseFood,
         floor (int): The lowest allowed value of the column. Defaults to 0.
         ceiling (int): The highest allowed value in the column.
             Defaults to the maximum value in the column.
-        col (str): The column name to operate on.  Defaults to corn_syrup_idx.
+        col (str): The column name to operate on.  Defaults to sugar_idx.
 
     Returns:
         pd.DataFrame: A new dataframe, where only the rows within the values
@@ -177,7 +177,7 @@ def main(csv_file: str):
       3. Establishes a subset to the top 10 brands
       4. Outputs metrics on the subset.
       5. Establishes another subset from the dataframe by limiting
-         the data to only values that have corn syrup
+         the data to only values that have corn syrup and sugar
       6. Produces a violin plot to show our data density across the
          top 10 groups.
      
