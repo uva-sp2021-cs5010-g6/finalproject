@@ -32,13 +32,15 @@ def establish_food_object(csv_file: str) -> food_parser.FoodBrandObject:
     bfood = food_parser.FoodBrandObject(csv_file)
     bfood.cleanup()
     bfood.run_on_df(food_parser.insert_index, find="corn syrup")
+    bfood.run_on_df(food_parser.insert_index, find="sugar")
+    bfood.run_on_df(food_parser.insert_index, find="salt")
     return bfood
 
 
-def clamp_cornsyrup(bfood: food_parser.BaseFood,
-                    floor: int = 0,
-                    ceiling: int = None,
-                    col: str = "corn_syrup_idx") -> pd.DataFrame:
+def clamp(bfood: food_parser.BaseFood,
+          floor: int = 0,
+          ceiling: int = None,
+          col: str = "corn_syrup_idx") -> pd.DataFrame:
     """Clamping function used to filter the allowed indices of a column.
 
     Args:
@@ -83,7 +85,7 @@ def metrics_on_food_categories(df: pd.DataFrame,
     return [df[col].describe(), df[col].value_counts()]
 
 
-def plot(df: pd.DataFrame, out: str = "plot.png"):
+def plot(df: pd.DataFrame, col="corn_syrup_idx", out: str = "plot.png"):
     """Creates a violin plot of the distribution of data.
 
     Args:
@@ -96,9 +98,12 @@ def plot(df: pd.DataFrame, out: str = "plot.png"):
     # Note, we need to establish the figure to ensure sns doesn't
     # try to add to its prior plot.
     fig, ax1 = plt.subplots(figsize=(12,6))
-    ax_sns = sns.violinplot(x="corn_syrup_idx",
+    ax_sns = sns.violinplot(x=col,
                             y="branded_food_category",
                             orient="h",
+                            bw=0.2,
+                            cut=0,
+                            scale="width",
                             data=df, ax=ax1)
     ax1.set(xlabel="Rank",
             ylabel="Food Category")
@@ -132,14 +137,16 @@ def main(csv_file: str):
         plots are written out to file.
     """
     bfood = establish_food_object(csv_file)
-    pprint.pprint(metrics_on_food_categories(bfood.df))
     df = find_top_five_food_categories(bfood)
     pprint.pprint(metrics_on_food_categories(df))
-    metrics_on_food_categories(df)
-    df_cornsyrup_nomax = clamp_cornsyrup(bfood)
-    plot(df_cornsyrup_nomax, out="q3-unbound.png")
-    df_cornsyrup_10max = clamp_cornsyrup(bfood, ceiling=10)
-    plot(df_cornsyrup_10max, out="q3-10max.png")
+    # Very wide range, adjust for mean
+    #df_cornsyrup_nomax = clamp(bfood)
+    #plot(df_cornsyrup_nomax, out="q3-unbound-cornsyrup.png")
+    df_cornsyrup_10max = clamp(bfood, ceiling=10)
+    plot(df_cornsyrup_10max, out="q3-10max-cornsyrup.png")
+    df_sugar = clamp(bfood, col="sugar_idx")
+    plot(df_sugar, out="q3-sugar.png")
+    
 
 
 if __name__ == "__main__":

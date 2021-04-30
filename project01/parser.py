@@ -8,6 +8,7 @@ and each of our data tables could expand upon.
 """
 
 import os
+import re
 from typing import Any, List, Optional
 
 import pandas as pd
@@ -21,6 +22,7 @@ class BaseFood:
     """
     def __init__(self, csv_file: str = None, *args, **kwargs) -> None:
         self._df = self._parse_csv(csv_file)
+        self._ingredients = None
 
     @staticmethod
     def _parse_csv(csv_file: str) -> pd.DataFrame:
@@ -166,12 +168,46 @@ class FoodBrandObject(BaseFood):
         """
         self._df['modified_date'] = pd.to_datetime(self._df['modified_date'], format="%Y-%m-%d")
         self._df['available_date'] = pd.to_datetime(self._df['available_date'], format='%Y-%m-%d')
-        self._df['discontinued_date'] = pd.to_datetime(self._df['discontinued_date'], format='%Y-%m-%d')
-        # del self._df['discontinued_date'] # We are dropping columns as well later.
+        #self._df['discontinued_date'] = pd.to_datetime(self._df['discontinued_date'], format='%Y-%m-%d')
+        del self._df['discontinued_date']
         self._df.dropna(how='all')
         self._df.dropna(subset=['brand_owner', 'ingredients', 'serving_size',
                                 'serving_size_unit', 'branded_food_category'], inplace=True)
         return self._df
+
+    def get_all_ingredients(self):
+        """Parses the entire ingridents series of the dataframe to establish a list of all ingredients.
+
+        Returns:
+           set: A set of the ingredients within the dataframe.
+        """
+        def clean(ing):
+            """Performs simple splitting and parsing of an ingredients list.
+
+            Args:
+                ing (str): a string representing a product's ingriedents list.
+
+            Returns:
+                tuple: A split list of ingredients after being normalized for later processing.
+            """
+            # Strip paren text
+            # Remove paren and bracket text
+            cleaned1 = re.sub("[\(\[].*?[\)\]]", "", str(ing))
+            # Remove residual punctuation, save our "comma" delimiter
+            cleaned2 = re.sub(r'[#\.:\-*?!&}{][()"]', "", cleaned1)
+            # Return a tuple split on the comma, removing whitespace
+            pt1 = list(i.strip() for i in cleaned2.lower().split(","))
+            # Split on nested semicolon list for ingredients
+            pt2 = list(i.strip() for lst in pt1 for i in lst.split(";"))
+            # Split on subsequent ingredients
+            pt3 = list(i.strip() for lst in pt2 for i in lst.split(":"))
+            # Split on "statement" ingredients
+            pt4 = list(i.strip() for lst in pt3 for i in lst.split("."))
+            # Return as an immutable type to make converting to a set easier
+            return tuple(pt4) 
+        # Unfold the list into a flattened set and then back to a list (for ease of access)
+        self._ingredients = tuple(set(x.strip() for lst in self._df["ingredients"].apply(clean).tolist() for x in lst))
+        return self._ingredients
 
 
 def load(csv_dir: Optional[str] = "dataset") -> List[FoodObject]:
@@ -210,6 +246,7 @@ def find_index_from_str(delimited_string: str, fnd: str, split: str = ","):
             idx = -1  # Entry not found
             continue
     return rank
+
 
 
 def insert_index(df: pd.DataFrame,
