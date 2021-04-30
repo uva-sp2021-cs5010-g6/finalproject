@@ -90,6 +90,7 @@ def plot(df: pd.DataFrame, col="corn_syrup_idx", out: str = "plot.png"):
 
     Args:
         df (pd.DataFrame): The dataframe to use when plotting.
+        col (str): The column to use for the violinplot magnitude.
         out (str): The path to save the plotting graphic to.
 
     Returns:
@@ -97,14 +98,14 @@ def plot(df: pd.DataFrame, col="corn_syrup_idx", out: str = "plot.png"):
     """
     # Note, we need to establish the figure to ensure sns doesn't
     # try to add to its prior plot.
-    fig, ax1 = plt.subplots(figsize=(12,6))
-    ax_sns = sns.violinplot(x=col,
-                            y="branded_food_category",
-                            orient="h",
-                            bw=0.2,
-                            cut=0,
-                            scale="width",
-                            data=df, ax=ax1)
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    sns.violinplot(x=col,
+                   y="branded_food_category",
+                   orient="h",
+                   bw=0.2,
+                   cut=0,
+                   scale="width",
+                   data=df, ax=ax1)
     ax1.set(xlabel="Rank",
             ylabel="Food Category")
     # Calling plt.tight_layout() ensures our labels fit in our
@@ -140,14 +141,13 @@ def main(csv_file: str):
     df = find_top_five_food_categories(bfood)
     pprint.pprint(metrics_on_food_categories(df))
     # Very wide range, adjust for mean
-    #df_cornsyrup_nomax = clamp(bfood)
-    #plot(df_cornsyrup_nomax, out="q3-unbound-cornsyrup.png")
+    # df_cornsyrup_nomax = clamp(bfood)
+    # plot(df_cornsyrup_nomax, out="q3-unbound-cornsyrup.png")
     df_cornsyrup_10max = clamp(bfood, ceiling=10)
     plot(df_cornsyrup_10max, out="q3-10max-cornsyrup.png")
     df_sugar = clamp(bfood, col="sugar_idx")
     plot(df_sugar, out="q3-sugar.png")
     
-
 
 if __name__ == "__main__":
     brand_csv = sys.argv[1] if len(sys.argv) > 2 else "./dataset/FoodData_Central_csv_2020-10-30/branded_food.csv"

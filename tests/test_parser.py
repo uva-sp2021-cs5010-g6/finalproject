@@ -1,6 +1,4 @@
-import pytest
 
-import os
 import pandas as pd
 
 import project01.parser as parser
@@ -56,35 +54,35 @@ def test_cornsyrup_clamp_mutates_df(datadir):
 def test_cornsyrup_clamp_alt_column(datadir):
     bfood = parser.BaseFood(datadir.join("simple.csv"))
     bfood.df["id"] = pd.to_numeric(bfood.df["id"])
-    ret = bfood.clamp(col="id")
+    bfood.clamp(col="id")
     assert len(bfood.df) == 4
 
 
 def test_cornsyrup_clamp_alt_floor(datadir):
     bfood = parser.BaseFood(datadir.join("simple.csv"))
     bfood.df["corn_syrup_idx"] = pd.to_numeric(bfood.df["corn_syrup_idx"])
-    ret = bfood.clamp(floor=-5)
+    bfood.clamp(floor=-5)
     assert len(bfood.df) == 4
 
 
 def test_cornsyrup_clamp_alt_floor2(datadir):
     bfood = parser.BaseFood(datadir.join("simple.csv"))
     bfood.df["corn_syrup_idx"] = pd.to_numeric(bfood.df["corn_syrup_idx"])
-    ret = bfood.clamp(floor=-10000)
+    bfood.clamp(floor=-10000)
     assert len(bfood.df) == 6
 
 
 def test_cornsyrup_clamp_alt_ceil(datadir):
     bfood = parser.BaseFood(datadir.join("simple.csv"))
     bfood.df["corn_syrup_idx"] = pd.to_numeric(bfood.df["corn_syrup_idx"])
-    ret = bfood.clamp(ceiling=25)
+    bfood.clamp(ceiling=25)
     assert len(bfood.df) == 1
 
 
 def test_cornsyrup_clamp_alt_constrained(datadir):
     bfood = parser.BaseFood(datadir.join("simple.csv"))
     bfood.df["corn_syrup_idx"] = pd.to_numeric(bfood.df["corn_syrup_idx"])
-    df_result = bfood.clamp(floor=-60, ceiling=25)
+    bfood.clamp(floor=-60, ceiling=25)
     assert len(bfood.df) == 4
 
 
