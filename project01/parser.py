@@ -191,9 +191,9 @@ class FoodBrandObject(BaseFood):
             """
             # Strip paren text
             # Remove paren and bracket text
-            cleaned1 = re.sub("[([].*?[)]]", "", str(ing))
+            cleaned1 = re.sub(r'[\(\[].*?[\)\]]', "", str(ing))  # noqa
             # Remove residual punctuation, save our "comma" delimiter
-            cleaned2 = re.sub(r'[#.:\-*?!&}{][()"]', "", cleaned1)
+            cleaned2 = re.sub(r'[#.:\-*?!&}{\]\[\(\)"]', "", cleaned1)  # noqa
             # Return a tuple split on the comma, removing whitespace
             pt1 = list(i.strip() for i in cleaned2.lower().split(","))
             # Split on nested semicolon list for ingredients
