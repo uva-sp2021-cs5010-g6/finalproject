@@ -11,6 +11,7 @@ import sys
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from sklearn import linear_model as lm
 
 from matplotlib import pyplot as plt
 from typing import List
@@ -141,6 +142,24 @@ def correlation(bfood: food_parser.BaseFood, out: str = "q3-correlation.png"):
     myfig.savefig(out)
 
 
+def lin_model(df):
+    newdf = pd.DataFrame({"category": df["branded_food_category"],
+                          "sugar": df["sugar_idx"],
+                          "corn_syrup": df["corn_syrup_idx"]})
+    # Insert NaNs for no matches to ensure our counts aren't skewed.
+    newdf.loc[newdf["sugar"] == -1, "sugar"] = np.NaN
+    newdf.loc[newdf["corn_syrup"] == -1, "corn_syrup"] = np.NaN
+    reg = lm.LinearRegression()
+    X = newdf["corn_syrup"].values.reshape(-1, 1)
+    y = newdf["sugar"].values.reshape(-1, 1)
+    reg.fit(X, y)
+    print(f"y = {reg.intercept_} + {reg.coef_}x")
+    yhat = reg.predict(X)
+    SSres = sum((y-yhat)**2)
+    SSt = sum((y-np.mean(y))**2)
+    rsq = 1 - (float(SSres))/SSt
+    print(f"R2 = {rsq}")
+
 def main(csv_file: str):
     """Pythonic driver for our third question / query
 
@@ -166,7 +185,7 @@ def main(csv_file: str):
     """
     bfood = establish_food_object(csv_file)
     df = find_top_five_food_categories(bfood)
-    metrics_on_food_categories(bfood.df)
+    print(metrics_on_food_categories(bfood.df))
     # Very wide range, adjusted to 10 as this seems to match most index returns.
     df_cornsyrup = clamp(bfood)
     plot_foodcat(df_cornsyrup, out="q3-cornsyrup-cat.png")
@@ -174,7 +193,8 @@ def main(csv_file: str):
     plot_foodcat(df_sugar, out="q3-sugar.png")
     density(bfood, out="q3-density.png")
     correlation(bfood, out="q3-correlation.png")
-    
+    lin_model(bfood.df)
+
 
 if __name__ == "__main__":
     brand_csv = sys.argv[1] if len(sys.argv) > 2 else "./dataset/FoodData_Central_csv_2020-10-30/branded_food.csv"
