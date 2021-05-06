@@ -7,13 +7,14 @@ be run directly using python3 -m project01.question3 after the files
 have been fetched from the USDA (see `project01.fetcher`).
 """
 
-from typing import List
-import pprint
 import sys
+import numpy as np
 import pandas as pd
 import seaborn as sns
+from sklearn import linear_model as lm
 
 from matplotlib import pyplot as plt
+from typing import List
 
 import project01.parser as food_parser
 
@@ -33,7 +34,6 @@ def establish_food_object(csv_file: str) -> food_parser.FoodBrandObject:
     bfood.cleanup()
     bfood.run_on_df(food_parser.insert_index, find="corn syrup")
     bfood.run_on_df(food_parser.insert_index, find="sugar")
-    bfood.run_on_df(food_parser.insert_index, find="salt")
     return bfood
 
 
@@ -85,11 +85,12 @@ def metrics_on_food_categories(df: pd.DataFrame,
     return [df[col].describe(), df[col].value_counts()]
 
 
-def plot(df: pd.DataFrame, col="corn_syrup_idx", out: str = "plot.png"):
+def plot_foodcat(df: pd.DataFrame, col="corn_syrup_idx", out: str = "plot.png"):
     """Creates a violin plot of the distribution of data.
 
     Args:
         df (pd.DataFrame): The dataframe to use when plotting.
+        col (str): The column to use for the violinplot magnitude.
         out (str): The path to save the plotting graphic to.
 
     Returns:
@@ -97,14 +98,14 @@ def plot(df: pd.DataFrame, col="corn_syrup_idx", out: str = "plot.png"):
     """
     # Note, we need to establish the figure to ensure sns doesn't
     # try to add to its prior plot.
-    fig, ax1 = plt.subplots(figsize=(12,6))
-    ax_sns = sns.violinplot(x=col,
-                            y="branded_food_category",
-                            orient="h",
-                            bw=0.2,
-                            cut=0,
-                            scale="width",
-                            data=df, ax=ax1)
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    sns.violinplot(x=col,
+                   y="branded_food_category",
+                   orient="h",
+                   bw=0.2,
+                   cut=0,
+                   scale="width",
+                   data=df, ax=ax1)
     ax1.set(xlabel="Rank",
             ylabel="Food Category")
     # Calling plt.tight_layout() ensures our labels fit in our
@@ -112,6 +113,52 @@ def plot(df: pd.DataFrame, col="corn_syrup_idx", out: str = "plot.png"):
     plt.tight_layout()
     fig.savefig(out)
 
+
+def density(bfood: food_parser.BaseFood, out: str = ""):
+    newdf = pd.DataFrame({"brand": bfood.df["branded_food_category"],
+                          "sugar": bfood.df["sugar_idx"],
+                          "corn_syrup": bfood.df["corn_syrup_idx"]})
+    # Insert NaNs for no matches to ensure our counts aren't skewed.
+    newdf.loc[newdf["sugar"] == -1, "sugar"] = np.NaN
+    newdf.loc[newdf["corn_syrup"] == -1, "corn_syrup"] = np.NaN
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    sns.histplot(element="step", bins=30, ax=ax1, data=newdf)
+    ax1.set(xlabel="Index",
+            ylabel="Count")
+    # Calling plt.tight_layout() ensures our labels fit in our
+    # plotting space.
+    plt.tight_layout()
+    fig.savefig(out)
+
+
+def correlation(bfood: food_parser.BaseFood, out: str = "q3-correlation.png"):
+    newdf = pd.DataFrame({"category": bfood.df["branded_food_category"],
+                          "sugar": bfood.df["sugar_idx"],
+                          "corn_syrup": bfood.df["corn_syrup_idx"]})
+    # Insert NaNs for no matches to ensure our counts aren't skewed.
+    newdf.loc[newdf["sugar"] == -1, "sugar"] = np.NaN
+    newdf.loc[newdf["corn_syrup"] == -1, "corn_syrup"] = np.NaN
+    myfig = sns.pairplot(data=newdf, hue="category", markers="|", kind="reg")
+    myfig.savefig(out)
+
+
+def lin_model(df):
+    newdf = pd.DataFrame({"category": df["branded_food_category"],
+                          "sugar": df["sugar_idx"],
+                          "corn_syrup": df["corn_syrup_idx"]})
+    # Insert NaNs for no matches to ensure our counts aren't skewed.
+    newdf.loc[newdf["sugar"] == -1, "sugar"] = np.NaN
+    newdf.loc[newdf["corn_syrup"] == -1, "corn_syrup"] = np.NaN
+    reg = lm.LinearRegression()
+    X = newdf["corn_syrup"].values.reshape(-1, 1)
+    y = newdf["sugar"].values.reshape(-1, 1)
+    reg.fit(X, y)
+    print(f"y = {reg.intercept_} + {reg.coef_}x")
+    yhat = reg.predict(X)
+    SSres = sum((y-yhat)**2)
+    SSt = sum((y-np.mean(y))**2)
+    rsq = 1 - (float(SSres))/SSt
+    print(f"R2 = {rsq}")
 
 def main(csv_file: str):
     """Pythonic driver for our third question / query
@@ -138,15 +185,15 @@ def main(csv_file: str):
     """
     bfood = establish_food_object(csv_file)
     df = find_top_five_food_categories(bfood)
-    pprint.pprint(metrics_on_food_categories(df))
-    # Very wide range, adjust for mean
-    #df_cornsyrup_nomax = clamp(bfood)
-    #plot(df_cornsyrup_nomax, out="q3-unbound-cornsyrup.png")
-    df_cornsyrup_10max = clamp(bfood, ceiling=10)
-    plot(df_cornsyrup_10max, out="q3-10max-cornsyrup.png")
+    print(metrics_on_food_categories(bfood.df))
+    # Very wide range, adjusted to 10 as this seems to match most index returns.
+    df_cornsyrup = clamp(bfood)
+    plot_foodcat(df_cornsyrup, out="q3-cornsyrup-cat.png")
     df_sugar = clamp(bfood, col="sugar_idx")
-    plot(df_sugar, out="q3-sugar.png")
-    
+    plot_foodcat(df_sugar, out="q3-sugar.png")
+    density(bfood, out="q3-density.png")
+    correlation(bfood, out="q3-correlation.png")
+    lin_model(bfood.df)
 
 
 if __name__ == "__main__":

@@ -83,7 +83,6 @@ class BaseFood:
         """Clamping function used to filter the allowed indices of a column.
 
         Args:
-            df (pd.DataFrame): The dataframe to operate on.
             floor (int): The lowest allowed value of the column. Defaults to 0.
             ceiling (int): The highest allowed value in the column.
                 Defaults to the maximum value in the column.
@@ -168,7 +167,7 @@ class FoodBrandObject(BaseFood):
         """
         self._df['modified_date'] = pd.to_datetime(self._df['modified_date'], format="%Y-%m-%d")
         self._df['available_date'] = pd.to_datetime(self._df['available_date'], format='%Y-%m-%d')
-        #self._df['discontinued_date'] = pd.to_datetime(self._df['discontinued_date'], format='%Y-%m-%d')
+        # self._df['discontinued_date'] = pd.to_datetime(self._df['discontinued_date'], format='%Y-%m-%d')
         del self._df['discontinued_date']
         self._df.dropna(how='all')
         self._df.dropna(subset=['brand_owner', 'ingredients', 'serving_size',
@@ -192,9 +191,9 @@ class FoodBrandObject(BaseFood):
             """
             # Strip paren text
             # Remove paren and bracket text
-            cleaned1 = re.sub("[\(\[].*?[\)\]]", "", str(ing))
+            cleaned1 = re.sub(r'[\(\[].*?[\)\]]', "", str(ing))  # noqa
             # Remove residual punctuation, save our "comma" delimiter
-            cleaned2 = re.sub(r'[#\.:\-*?!&}{][()"]', "", cleaned1)
+            cleaned2 = re.sub(r'[#.:\-*?!&}{\]\[\(\)"]', "", cleaned1)  # noqa
             # Return a tuple split on the comma, removing whitespace
             pt1 = list(i.strip() for i in cleaned2.lower().split(","))
             # Split on nested semicolon list for ingredients
@@ -243,16 +242,14 @@ def find_index_from_str(delimited_string: str, fnd: str, split: str = ","):
             rank = idx+1
             break
         except ValueError:
-            idx = -1  # Entry not found
             continue
     return rank
 
 
-
 def insert_index(df: pd.DataFrame,
-                            find: str,
-                            col: str = "ingredients",
-                            sep: str = ",") -> pd.DataFrame:
+                 find: str,
+                 col: str = "ingredients",
+                 sep: str = ",") -> pd.DataFrame:
     """Augments dataframe to add a ranked index column.
 
     This function inspects an existing dataframe's column and

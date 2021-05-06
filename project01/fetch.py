@@ -40,7 +40,8 @@ class Fetcher:
         self._base = base
         self._feedback = feedback
 
-    def __parse_file(self, uri_file):
+    @staticmethod
+    def __parse_file(uri_file):
         """Establishs a link of URIs to download.
         
         Args:
@@ -67,7 +68,7 @@ class Fetcher:
         self._uris.append(uri)
         return self._uris
 
-    def fetch(self, feedback: bool=None, out: str=None) -> None:
+    def fetch(self, feedback: bool = None, out: str = None) -> str:
         """Downloads all URIs the the current object and extracts them to the class's directory.
 
         Args:
@@ -86,23 +87,23 @@ class Fetcher:
                 # Use stream to download very large files
                 resp = requests.get(uri, stream=True)
                 resp.raise_for_status()
-                uri_size = resp.headers.get('content-length') # Get the size of the download
+                uri_size = resp.headers.get('content-length')  # Get the size of the download
                 if feedback:
                     print("Downloading {}".format(uri))
-                with open(os.path.join(temp_dir,filename), "wb") as zipf:
+                with open(os.path.join(temp_dir, filename), "wb") as zipf:
                     tracker = 0
                     for block in resp.iter_content(4096):
                         tracker += len(block)
                         zipf.write(block)
                         if feedback:
-                            done = int( 50 * tracker / int(uri_size)) # Total Progress
+                            done = int(50 * tracker / int(uri_size))  # Total Progress
                             # We need an unbuffered printer here...
-                            sys.stdout.write("\r[%s%s] %s/100" % ('=' * done, ' ' * (50-done), done*2) )    
+                            sys.stdout.write("\r[%s%s] %s/100" % ('=' * done, ' ' * (50-done), done*2))
                             sys.stdout.flush()
                     print("")
             for root, dirs, files in os.walk(temp_dir):
                 for zipf in files:
-                    temp_zip = os.path.join(root,zipf)
+                    temp_zip = os.path.join(root, zipf)
                     with zipfile.ZipFile(temp_zip, "r") as zf:
                         if feedback:
                             print("Extracting {}".format(zipf))
