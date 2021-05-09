@@ -36,7 +36,7 @@ import project01.parser as parser
     #import in the parser.py  file from the project01 folder so we can
     #instantiate Classes and call functions created within the parser.py script
 
-branded_food = parser.BaseFood('/Users/swaroopveerabhadrappa/PycharmProjects/finalproject/dataset/FoodData_Central_csv_2020-10-30/branded_food.csv')
+branded_food = parser.BaseFood('./dataset/FoodData_Central_csv_2020-10-30/branded_food.csv')
     #loading the data set
     #create a object  by instantiating BaseFood class, which is designed to create
     # a Data Frame out of a passed in CSV file, which in this case is "branded_food.csv"

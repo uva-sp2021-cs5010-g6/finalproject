@@ -103,5 +103,5 @@ def main(csv_file: str):
 
 
 if __name__ == "__main__":
-    brand_csv = sys.argv[1] if len(sys.argv) > 2 else "../dataset/FoodData_Central_csv_2020-10-30/branded_food.csv"
+    brand_csv = sys.argv[1] if len(sys.argv) > 2 else "./dataset/FoodData_Central_csv_2020-10-30/branded_food.csv"
     main(csv_file=brand_csv)

@@ -36,6 +36,22 @@ project01.parser module
    :undoc-members:
    :show-inheritance:
 
+project01.process module
+------------------------
+
+.. automodule:: project01.process
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+project01.question1 module
+--------------------------
+
+.. automodule:: project01.question1
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 project01.question2 module
 --------------------------
 

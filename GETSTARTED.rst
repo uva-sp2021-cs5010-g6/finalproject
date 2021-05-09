@@ -40,6 +40,16 @@ To run the URI fetcher, you must first be in your poetry environment, and then y
    poetry shell
    python -m project01.fetch
 
+Running EDA
+===========
+
+The EDA script can be run directly from the poetry shell
+
+.. code-block:: bash
+
+   poetry shell # No need to run if you're already in the poetry shell from before.
+   python project01.EDA
+
 
 Running the Questions
 =====================
@@ -48,7 +58,7 @@ All questions are written as valid modules that can run within the poetry enviro
 
 .. code-block:: bash
 
-   poetry shell # If you're already in a poetry session, you won't need to run this command
+   poetry shell # No need to run if you're already in the poetry shell from before.
    python -m project01.question1
    python -m project01.question2
    python -m project01.question3
@@ -62,7 +72,7 @@ To run our tests, once again, you'll need to execute a command after starting th
 
 .. code-block:: bash
 
-   poetry shell # If you're already in a poetry session, you won't need to run this command
+   poetry shell # No need to run if you're already in the poetry shell from before.
    pytest
 
 Building the API Website
@@ -72,9 +82,11 @@ You can build a copy of our API documentation by navigating to the `sphinx-build
 
 .. code-block:: bash
 
-   poetry shell # ibid.
+   poetry shell # If you're already in a poetry session, you won't need to run this command
    cd ./sphinx-doc
    sphinx-apidoc -f -o ./source ../project01
    sphinx-build -M html ./source ./build
 
 Or by running ``make api html`` if running on a system with GNU Make installed.
+
+The HTML documentation site will be lcoated in ``./build/html/index.html``
