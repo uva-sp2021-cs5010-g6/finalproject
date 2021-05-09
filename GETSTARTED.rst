@@ -64,3 +64,17 @@ To run our tests, once again, you'll need to execute a command after starting th
 
    poetry shell # If you're already in a poetry session, you won't need to run this command
    pytest
+
+Building the API Website
+========================
+
+You can build a copy of our API documentation by navigating to the `sphinx-build` folder and running the following commands
+
+.. code-block:: bash
+
+   poetry shell # ibid.
+   cd ./sphinx-doc
+   sphinx-apidoc -f -o ./source ../project01
+   sphinx-build -M html ./source ./build
+
+Or by running ``make api html`` if running on a system with GNU Make installed.
